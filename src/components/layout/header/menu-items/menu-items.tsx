@@ -7,20 +7,30 @@ export const MenuItems = observer(() => {
     const { localize } = useTranslations();
     const store = useStore();
     
-    // Optional: Remove these two lines if you want the link to show up EVEN WHEN users are logged out
     const is_logged_in = store?.client?.is_logged_in ?? false;
     if (!is_logged_in) return null;
 
     return (
         <>
-            {/* Custom Free Bots Tab Link */}
             <MenuItem
                 as='a'
                 className='app-header__menu'
                 href='/bots/over-and-under.xml'
                 download='Over_and_Under_Strategy.xml'
+                style={{
+                    padding: '4px 8px',
+                    minWidth: 'auto',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    textDecoration: 'none'
+                }}
             >
-                <Text style={{ color: '#00ff88', fontWeight: 'bold' }}>
+                <Text style={{ 
+                    color: '#00ff88', 
+                    fontWeight: 'bold', 
+                    fontSize: '13px',
+                    whiteSpace: 'nowrap'
+                }}>
                     {localize('🎲 Free Bots')}
                 </Text>
             </MenuItem>
@@ -32,7 +42,6 @@ export const TradershubLink = observer(() => {
     return null;
 });
 
-// Namespace wiring
 type MenuItemsType = typeof MenuItems & {
     TradershubLink: typeof TradershubLink;
 };
@@ -40,3 +49,4 @@ type MenuItemsType = typeof MenuItems & {
 (MenuItems as MenuItemsType).TradershubLink = TradershubLink;
 
 export default MenuItems as MenuItemsType;
+                    
