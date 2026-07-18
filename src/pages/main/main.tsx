@@ -78,7 +78,7 @@ const AppWrapper = observer(() => {
     const { clear } = summary_card;
     const { DASHBOARD, BOT_BUILDER } = DBOT_TABS;
     const init_render = React.useRef(true);
-    const hash = ['dashboard', 'bot_builder', 'chart', 'tutorial'];
+    const hash = ['dashboard', 'bot_builder', 'free_bots', 'chart', 'tutorial'];
     const { isDesktop } = useDevice();
     const location = useLocation();
     const navigate = useNavigate();
@@ -405,6 +405,18 @@ const AppWrapper = observer(() => {
                                 }
                                 id='id-bot-builder'
                             />
+                            <div
+                                label={<Localize i18n_default_text='🎲 Free Bots' />}
+                                id='id-free-bots'
+                            >
+                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                    <iframe
+                                        src='/bots/over-and-under.xml'
+                                        style={{ width: '100%', height: '100%', border: 'none' }}
+                                        title='Free Bots'
+                                    />
+                                </div>
+                            </div>
                             <div
                                 label={
                                     <>
