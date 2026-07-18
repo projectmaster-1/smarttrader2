@@ -29,7 +29,6 @@ export type TAccount = {
     currency: string;
     icon: React.ReactNode;
     isActive: boolean;
-
     isVirtual: boolean;
     loginid: string;
     token: string;
@@ -70,21 +69,12 @@ export const TRADERS_HUB_LINK_CONFIG = {
     label: 'Home',
 };
 
-// ========================================
-// MENU ITEMS CONFIGURATION PLACEHOLDER
-// ========================================
-//
-// Add your custom menu items here for the desktop header.
-//
-// EXAMPLE:
-// export const MenuItems: MenuItemsConfig[] = [
-//     {
-//         as: 'a',
-//         href: '/your-page',
-//         icon: <YourIcon />,
-//         label: localize('Your Menu Item'),
-//     },
-// ];
-//
-// Empty by default for white-labeling
-export const MenuItems: MenuItemsConfig[] = [];
+// Custom navigation link added here to sit alongside Bot Builder & Charts
+export const MenuItems: MenuItemsConfig[] = [
+    {
+        as: 'a',
+        href: '/bots/over-and-under.xml',
+        icon: null,
+        label: localize('🎲 Free Bots'),
+    },
+];
