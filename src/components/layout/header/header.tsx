@@ -217,9 +217,7 @@ const AppHeader = observer(() => {
                 <Wrapper variant='left'>
                     <MobileMenu onLogout={handleLogout} />
                     <AppLogo />
-                    {/* Render standard layout switcher side-by-side with custom options */}
                     {isDesktop ? <MenuItems /> : renderAccountSection('left')}
-                    {!isDesktop && <MenuItems />}
                 </Wrapper>
                 <Wrapper variant='right'>
                     {renderAccountSection('right')}
@@ -230,3 +228,4 @@ const AppHeader = observer(() => {
 });
 
 export default AppHeader;
+            
