@@ -23,10 +23,6 @@ const AppHeader = observer(() => {
     const [authTimeout, setAuthTimeout] = useState(false);
     const is_account_regenerating = client?.is_account_regenerating || false;
 
-    // Detect OAuth callback on mount (before App.tsx cleans up the URL).
-    // When ?code=...&state=... is present the full auth flow can take 7-15 s
-    // (token exchange → accounts fetch → OTP → WebSocket auth), so we must
-    // suppress the short fallback timeout and keep the spinner throughout.
     const [isOAuthPending, setIsOAuthPending] = useState(() => {
         const params = new URLSearchParams(window.location.search);
         return Boolean(params.get('code') && params.get('state'));
@@ -39,8 +35,6 @@ const AppHeader = observer(() => {
 
     const handleLogout = useLogout();
 
-    // Clear OAuth-pending flag once the account is set (auth succeeded)
-    // or after a generous timeout in case something goes wrong.
     useEffect(() => {
         if (!isOAuthPending) return;
 
@@ -49,12 +43,10 @@ const AppHeader = observer(() => {
             return;
         }
 
-        // Safety net: give up after 30 s and let the normal flow decide
         const timer = setTimeout(() => setIsOAuthPending(false), 30_000);
         return () => clearTimeout(timer);
     }, [isOAuthPending, activeLoginid]);
 
-    // Handle direct URL access with legacy token param
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const account_id = urlParams.get('account_id');
@@ -63,8 +55,6 @@ const AppHeader = observer(() => {
         }
     }, [setIsAuthorizing]);
 
-    // Fallback timeout: show login button if auth never resolves.
-    // Suppressed during the OAuth callback flow (isOAuthPending = true).
     useEffect(() => {
         if (isOAuthPending) return;
 
@@ -101,14 +91,10 @@ const AppHeader = observer(() => {
 
     const handleLogin = useCallback(async () => {
         try {
-            // Set authorizing state immediately when login is clicked
             setIsAuthorizing(true);
-
-            // Generate OAuth URL with CSRF token and PKCE parameters
             const oauthUrl = await generateOAuthURL();
 
             if (oauthUrl) {
-                // Redirect to OAuth URL
                 window.location.replace(oauthUrl);
             } else {
                 console.error('Failed to generate OAuth URL');
@@ -116,7 +102,6 @@ const AppHeader = observer(() => {
             }
         } catch (error) {
             console.error('Login redirection failed:', error);
-            // Reset authorizing state if redirection fails
             setIsAuthorizing(false);
         }
     }, [setIsAuthorizing]);
@@ -132,10 +117,8 @@ const AppHeader = observer(() => {
 
     const renderAccountSection = useCallback(
         (position: 'left' | 'right' = 'right') => {
-            // Show account switcher and logout when user is fully authenticated
             if (activeLoginid && !is_account_regenerating) {
                 if (position === 'left' && !isDesktop) {
-                    // For mobile left section - only account switcher
                     return (
                         <div className='auth-actions'>
                             <div className='account-info'>
@@ -144,7 +127,6 @@ const AppHeader = observer(() => {
                         </div>
                     );
                 } else if (position === 'right') {
-                    // For right section - transfer button (and account switcher on desktop)
                     return (
                         <div className='auth-actions'>
                             {isDesktop && (
@@ -163,15 +145,11 @@ const AppHeader = observer(() => {
                     );
                 }
             }
-            // Show login button only when fully settled (not during OAuth flow)
             else if (
                 position === 'right' &&
                 !isOAuthPending &&
                 ((!is_account_regenerating && !isAuthorizing && !activeLoginid) || authTimeout)
             ) {
-                // Disable auth buttons until the OAuth app id is configured, so the
-                // click handlers (which would otherwise log "Failed to generate OAuth
-                // URL") never fire. The env-not-set toast explains why.
                 const isAuthConfigured = Boolean(process.env.NEXT_PUBLIC_DERIV_APP_ID);
                 return (
                     <div className='auth-actions'>
@@ -184,7 +162,6 @@ const AppHeader = observer(() => {
                     </div>
                 );
             }
-            // Default: Show spinner during loading states or when authorizing
             else if (position === 'right') {
                 return (
                     <div className='auth-actions auth-actions--loading'>
@@ -240,7 +217,9 @@ const AppHeader = observer(() => {
                 <Wrapper variant='left'>
                     <MobileMenu onLogout={handleLogout} />
                     <AppLogo />
+                    {/* Render standard layout switcher side-by-side with custom options */}
                     {isDesktop ? <MenuItems /> : renderAccountSection('left')}
+                    {!isDesktop && <MenuItems />}
                 </Wrapper>
                 <Wrapper variant='right'>
                     {renderAccountSection('right')}
